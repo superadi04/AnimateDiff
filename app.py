@@ -19,7 +19,7 @@ from animatediff.models.unet import UNet3DConditionModel
 from animatediff.pipelines.pipeline_animation import AnimationPipeline
 from animatediff.utils.util import save_videos_grid
 from animatediff.utils.convert_from_ckpt import convert_ldm_unet_checkpoint, convert_ldm_clip_checkpoint, convert_ldm_vae_checkpoint
-from animatediff.utils.convert_lora_safetensor_to_diffusers import convert_lora
+from animatediff.utils.convert_lora_safetensor_to_diffusers import convert_lora, convert_motion_lora_ckpt_to_diffusers
 
 
 sample_idx     = 0
@@ -129,9 +129,11 @@ class AnimateController:
         self.lora_model_state_dict = {}
         if lora_model_dropdown == "none": pass
         else:
-            with safe_open(lora_model_dropdown, framework="pt", device="cpu") as f:
-                for key in f.keys():
-                    self.lora_model_state_dict[key] = f.get_tensor(key)
+            self.lora_model_state_dict = torch.load(lora_model_dropdown, map_location="cpu")
+            self.lora_model_state_dict = self.lora_model_state_dict["state_dict"] if "state_dict" in self.lora_model_state_dict else self.lora_model_state_dict
+            # with safe_open(lora_model_dropdown, framework="pt", device="cpu") as f:
+            #     for key in f.keys():
+            #         self.lora_model_state_dict[key] = f.get_tensor(key)
         return gr.Dropdown.update()
 
     def animate(
@@ -165,7 +167,8 @@ class AnimateController:
         ).to("cuda")
         
         if self.lora_model_state_dict != {}:
-            pipeline = convert_lora(pipeline, self.lora_model_state_dict, alpha=lora_alpha_slider)
+            # pipeline = convert_lora(pipeline, self.lora_model_state_dict, alpha=lora_alpha_slider)
+            pipeline = convert_motion_lora_ckpt_to_diffusers(pipeline, self.lora_model_state_dict, lora_alpha_slider)
 
         pipeline.to("cuda")
 
