@@ -45,6 +45,7 @@ class AnimateController:
         self.basedir                = os.getcwd()
         self.stable_diffusion_dir   = os.path.join(self.basedir, "models", "StableDiffusion")
         self.motion_module_dir      = os.path.join(self.basedir, "models", "Motion_Module")
+        self.motion_lora_dir      = os.path.join(self.basedir, "models", "MotionLoRA")
         self.personalized_model_dir = os.path.join(self.basedir, "models", "DreamBooth_LoRA")
         self.savedir                = os.path.join(self.basedir, "samples", datetime.now().strftime("Gradio-%Y-%m-%dT%H-%M-%S"))
         self.savedir_sample         = os.path.join(self.savedir, "sample")
@@ -53,10 +54,12 @@ class AnimateController:
         self.stable_diffusion_list   = []
         self.motion_module_list      = []
         self.personalized_model_list = []
+        self.personalized_motion_lora_model_list = []
         
         self.refresh_stable_diffusion()
         self.refresh_motion_module()
         self.refresh_personalized_model()
+        self.refresh_personalized_motion_lora_model()
         
         # config models
         self.tokenizer             = None
@@ -78,6 +81,10 @@ class AnimateController:
     def refresh_personalized_model(self):
         personalized_model_list = glob(os.path.join(self.personalized_model_dir, "*.safetensors"))
         self.personalized_model_list = [os.path.basename(p) for p in personalized_model_list]
+
+    def refresh_personalized_motion_lora_model(self):
+        personalized_motion_lora_model_list = glob(os.path.join(self.motion_lora_dir, "*.ckpt"))
+        self.personalized_motion_lora_model_list = [os.path.basename(p) for p in personalized_motion_lora_model_list]
 
     def update_stable_diffusion(self, stable_diffusion_dropdown):
         self.tokenizer = CLIPTokenizer.from_pretrained(stable_diffusion_dropdown, subfolder="tokenizer")
@@ -253,7 +260,7 @@ def ui():
                 
                 lora_model_dropdown = gr.Dropdown(
                     label="Select LoRA model (optional)",
-                    choices=["none"] + controller.personalized_model_list,
+                    choices=["none"] + controller.personalized_motion_lora_model_list,
                     value="none",
                     interactive=True,
                 )
