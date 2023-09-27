@@ -125,7 +125,7 @@ class AnimateController:
             return gr.Dropdown.update()
 
     def update_lora_model(self, lora_model_dropdown):
-        lora_model_dropdown = os.path.join(self.personalized_model_dir, lora_model_dropdown)
+        lora_model_dropdown = os.path.join(self.motion_lora_dir, lora_model_dropdown)
         self.lora_model_state_dict = {}
         if lora_model_dropdown == "none": pass
         else:
