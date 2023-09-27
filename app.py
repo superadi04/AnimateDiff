@@ -271,9 +271,10 @@ def ui():
                 personalized_refresh_button = gr.Button(value="\U0001F503", elem_classes="toolbutton")
                 def update_personalized_model():
                     controller.refresh_personalized_model()
+                    controller.refresh_personalized_motion_lora_model()
                     return [
                         gr.Dropdown.update(choices=controller.personalized_model_list),
-                        gr.Dropdown.update(choices=["none"] + controller.personalized_model_list)
+                        gr.Dropdown.update(choices=["none"] + controller.personalized_motion_lora_model_list)
                     ]
                 personalized_refresh_button.click(fn=update_personalized_model, inputs=[], outputs=[base_model_dropdown, lora_model_dropdown])
 
