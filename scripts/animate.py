@@ -160,16 +160,11 @@ def main(args):
                 print(f"save to {savedir}/sample/{prompt}.gif")
                 
                 sample_idx += 1
-
-    samples = torch.concat(samples)
-    # save_videos_grid(samples, f"{savedir}/sample.gif", n_rows=4)
-
-    # OmegaConf.save(config, f"{savedir}/config.yaml")
-
+    
     gif_path = f"{savedir}/{args.user_id}.gif"
-    save_videos_grid(samples, gif_path, n_rows=4)
+    samples = torch.concat(samples)
+    save_videos_grid(samples, f"{savedir}/sample.gif", n_rows=4)
 
-    # Upload the gif to AWS
     upload_gif_file(gif_path, args.user_id, args.gif_num)
 
     # Delete the gif
