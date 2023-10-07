@@ -163,7 +163,7 @@ def main(args):
     
     gif_path = f"{savedir}/{args.user_id}.gif"
     samples = torch.concat(samples)
-    save_videos_grid(samples, f"{savedir}/sample.gif", n_rows=4)
+    save_videos_grid(samples, gif_path, n_rows=4)
 
     upload_gif_file(gif_path, args.user_id, args.gif_num)
 
