@@ -25,6 +25,7 @@ import csv, pdb, glob
 from safetensors import safe_open
 import math
 from pathlib import Path
+from PIL import Image, ImageSequence
 
 import boto3
 
@@ -48,6 +49,17 @@ def upload_gif_file(file_path, user_id, gif_num):
         )
     url = f"https://{bucket_name}.s3.amazonaws.com/{s3_file_name}"
     print(url)
+
+def make_gif_looping(file_path):
+    with Image.open(file_path) as im:
+        frames = [frame.copy() for frame in ImageSequence.Iterator(im)]
+        frames[0].save(
+            file_path,
+            save_all=True,
+            append_images=frames[1:],
+            loop=0,  # 0 means loop indefinitely
+            duration=frames[0].info['duration']
+        )
 
 def main(args):
     *_, func_args = inspect.getargvalues(inspect.currentframe())
@@ -164,6 +176,7 @@ def main(args):
     gif_path = f"{savedir}/{args.user_id}.gif"
     samples = torch.concat(samples)
     save_videos_grid(samples, gif_path, n_rows=4)
+    make_gif_looping(gif_path)
 
     upload_gif_file(gif_path, args.user_id, args.gif_num)
 
